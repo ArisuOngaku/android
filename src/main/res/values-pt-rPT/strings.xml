@@ -57,10 +57,6 @@
     <string name="upload_list_empty_headline">Não há carregamentos disponíveis.</string>
     <string name="file_list_folder">pasta</string>
     <string name="filedetails_select_file">Toque num ficheiro para visualizar a informação adicional.</string>
-    <string name="filedetails_size">Tamanho:</string>
-    <string name="filedetails_type">Tipo:</string>
-    <string name="filedetails_created">Criado:</string>
-    <string name="filedetails_modified">Modificado:</string>
     <string name="filedetails_download">Descarregar</string>
     <string name="filedetails_sync_file">Sincronizar</string>
     <string name="action_share">Partilhar</string>

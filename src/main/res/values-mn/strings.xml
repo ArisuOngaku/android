@@ -113,10 +113,6 @@
     <string name="upload_list_empty_text_auto_upload">зарим агуулгыг upload хийнэ үү, эсвэл автоматаар байршуулалтыг идэвхжүүл.</string>
     <string name="file_list_folder">хавтас</string>
     <string name="filedetails_select_file">нэмэлт мэдээлэл харуулах файл дээр дар</string>
-    <string name="filedetails_size">Хэмжээ:</string>
-    <string name="filedetails_type">Төрөл:</string>
-    <string name="filedetails_created">Үүсгэсэн:</string>
-    <string name="filedetails_modified">Өөрчлөгдсөн:</string>
     <string name="filedetails_download">Татаж авах</string>
     <string name="filedetails_sync_file">синхрончлох</string>
     <string name="filedetails_renamed_in_upload_msg">Файл байршуулах явцад %1$s нэртэй болсон</string>
