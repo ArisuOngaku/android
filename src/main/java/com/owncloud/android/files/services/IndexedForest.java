@@ -1,21 +1,17 @@
 /**
- *   ownCloud Android client application
+ * ownCloud Android client application
  *
- *   @author David A. Velasco
- *   Copyright (C) 2016 ownCloud Inc.
+ * @author David A. Velasco Copyright (C) 2016 ownCloud Inc.
  *
- *   This program is free software: you can redistribute it and/or modify
- *   it under the terms of the GNU General Public License version 2,
- *   as published by the Free Software Foundation.
+ * This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public
+ * License version 2, as published by the Free Software Foundation.
  *
- *   This program is distributed in the hope that it will be useful,
- *   but WITHOUT ANY WARRANTY; without even the implied warranty of
- *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *   GNU General Public License for more details.
+ * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied
+ * warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License for more
+ * details.
  *
- *   You should have received a copy of the GNU General Public License
- *   along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
+ * You should have received a copy of the GNU General Public License along with this program.  If not, see
+ * <http://www.gnu.org/licenses/>.
  */
 
 package com.owncloud.android.files.services;
@@ -41,13 +37,13 @@ import java.util.concurrent.ConcurrentMap;
  */
 public class IndexedForest<V> {
 
-    private ConcurrentMap<String, Node<V>> mMap = new ConcurrentHashMap<>();
+    private ConcurrentMap<String, Node> mMap = new ConcurrentHashMap<>();
 
     @SuppressWarnings("PMD.ShortClassName")
-    private class Node<V> {
+    private class Node {
         private String mKey;
-        private Node<V> mParent;
-        private Set<Node<V>> mChildren = new HashSet<>();    // TODO be careful with hash()
+        private Node mParent;
+        private Set<Node> mChildren = new HashSet<>();    // TODO be careful with hash()
         private V mPayload;
 
         // payload is optional
@@ -59,11 +55,11 @@ public class IndexedForest<V> {
             mPayload = payload;
         }
 
-        public Node<V> getParent() {
+        public Node getParent() {
             return mParent;
         }
 
-        public Set<Node<V>> getChildren() {
+        public Set<Node> getChildren() {
             return mChildren;
         }
 
@@ -75,20 +71,20 @@ public class IndexedForest<V> {
             return mPayload;
         }
 
-        public void addChild(Node<V> child) {
+        public void addChild(Node child) {
             mChildren.add(child);
             child.setParent(this);
         }
 
-        private void setParent(Node<V> parent) {
+        private void setParent(Node parent) {
             mParent = parent;
         }
 
-        public boolean hasChildren() {
-            return mChildren.size() > 0;
+        public boolean isEmpty() {
+            return mChildren.isEmpty();
         }
 
-        public void removeChild(Node<V> removed) {
+        public void removeChild(Node removed) {
             mChildren.remove(removed);
         }
 
@@ -101,8 +97,8 @@ public class IndexedForest<V> {
     public /* synchronized */ Pair<String, String> putIfAbsent(String accountName, String remotePath, V value) {
         String targetKey = buildKey(accountName, remotePath);
 
-        Node<V> valuedNode = new Node(targetKey, value);
-        Node<V> previousValue = mMap.putIfAbsent(
+        Node valuedNode = new Node(targetKey, value);
+        Node previousValue = mMap.putIfAbsent(
             targetKey,
             valuedNode
         );
@@ -115,8 +111,8 @@ public class IndexedForest<V> {
             String currentPath = remotePath;
             String parentPath;
             String parentKey;
-            Node<V> currentNode = valuedNode;
-            Node<V> parentNode = null;
+            Node currentNode = valuedNode;
+            Node parentNode = null;
             boolean linked = false;
             while (!OCFile.ROOT_PATH.equals(currentPath) && !linked) {
                 parentPath = new File(currentPath).getParent();
@@ -149,10 +145,10 @@ public class IndexedForest<V> {
 
     public Pair<V, String> removePayload(String accountName, String remotePath) {
         String targetKey = buildKey(accountName, remotePath);
-        Node<V> target = mMap.get(targetKey);
+        Node target = mMap.get(targetKey);
         if (target != null) {
             target.clearPayload();
-            if (!target.hasChildren()) {
+            if (target.isEmpty()) {
                 return remove(accountName, remotePath);
             }
         }
@@ -162,7 +158,7 @@ public class IndexedForest<V> {
 
     public /* synchronized */ Pair<V, String> remove(String accountName, String remotePath) {
         String targetKey = buildKey(accountName, remotePath);
-        Node<V> firstRemoved = mMap.remove(targetKey);
+        Node firstRemoved = mMap.remove(targetKey);
         String unlinkedFrom = null;
 
         if (firstRemoved != null) {
@@ -170,11 +166,11 @@ public class IndexedForest<V> {
             removeDescendants(firstRemoved);
 
             /// remove ancestors if only here due to firstRemoved
-            Node<V> removed = firstRemoved;
-            Node<V> parent = removed.getParent();
+            Node removed = firstRemoved;
+            Node parent = removed.getParent();
             while (parent != null) {
                 parent.removeChild(removed);
-                if (!parent.hasChildren()) {
+                if (parent.isEmpty()) {
                     removed = mMap.remove(parent.getKey());
                     parent = removed.getParent();
                 } else {
@@ -192,9 +188,9 @@ public class IndexedForest<V> {
         return new Pair<>(null, null);
     }
 
-    private void removeDescendants(Node<V> removed) {
-        Iterator<Node<V>> childrenIt = removed.getChildren().iterator();
-        Node<V> child = null;
+    private void removeDescendants(Node removed) {
+        Iterator<Node> childrenIt = removed.getChildren().iterator();
+        Node child;
         while (childrenIt.hasNext()) {
             child = childrenIt.next();
             mMap.remove(child.getKey());
@@ -208,7 +204,7 @@ public class IndexedForest<V> {
     }
 
     public /* synchronized */ V get(String key) {
-        Node<V> node = mMap.get(key);
+        Node node = mMap.get(key);
         if (node != null) {
             return node.getPayload();
         } else {
@@ -226,11 +222,11 @@ public class IndexedForest<V> {
      * Remove the elements that contains account as a part of its key
      * @param accountName
      */
-    public void remove(String accountName){
+    public void remove(String accountName) {
         Iterator<String> it = mMap.keySet().iterator();
         while (it.hasNext()) {
             String key = it.next();
-            Log_OC.d("IndexedForest", "Number of pending downloads= "  + mMap.size());
+            Log_OC.d("IndexedForest", "Number of pending downloads= " + mMap.size());
             if (key.startsWith(accountName)) {
                 mMap.remove(key);
             }
