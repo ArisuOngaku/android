@@ -77,7 +77,6 @@ public class PrintAsyncTask extends AsyncTask<Void, Void, Boolean> {
         HttpClient client = new HttpClient();
         GetMethod getMethod = new GetMethod(url);
 
-        FileOutputStream fos;
         try {
             int status = client.executeMethod(getMethod);
             if (status == HttpStatus.SC_OK) {
@@ -97,8 +96,6 @@ public class PrintAsyncTask extends AsyncTask<Void, Void, Boolean> {
                     return false;
                 }
 
-                BufferedInputStream bis = new BufferedInputStream(getMethod.getResponseBodyAsStream());
-                fos = new FileOutputStream(file);
                 long transferred = 0;
 
                 Header contentLength = getMethod.getResponseHeader("Content-Length");
@@ -107,10 +104,17 @@ public class PrintAsyncTask extends AsyncTask<Void, Void, Boolean> {
 
                 byte[] bytes = new byte[4096];
                 int readResult;
-                while ((readResult = bis.read(bytes)) != -1) {
-                    fos.write(bytes, 0, readResult);
-                    transferred += readResult;
+
+                try (
+                    BufferedInputStream bis = new BufferedInputStream(getMethod.getResponseBodyAsStream());
+                    FileOutputStream fos = new FileOutputStream(file);
+                ) {
+                    while ((readResult = bis.read(bytes)) != -1) {
+                        fos.write(bytes, 0, readResult);
+                        transferred += readResult;
+                    }
                 }
+
                 // Check if the file is completed
                 if (transferred != totalToTransfer) {
                     return false;

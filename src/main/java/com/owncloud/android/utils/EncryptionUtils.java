@@ -183,6 +183,9 @@ public final class EncryptionUtils {
         DecryptedFolderMetadata decryptedFolderMetadata = new DecryptedFolderMetadata(
                 encryptedFolderMetadata.getMetadata(), files);
 
+        TypeToken<DecryptedFolderMetadata.Data> folderDataType = new TypeToken<DecryptedFolderMetadata.Data>() {
+        };
+
         for (Map.Entry<String, EncryptedFolderMetadata.EncryptedFile> entry : encryptedFolderMetadata
                 .getFiles().entrySet()) {
             String key = entry.getKey();
@@ -199,9 +202,8 @@ public final class EncryptionUtils {
 
             // decrypt
             String dataJson = EncryptionUtils.decryptStringSymmetric(encryptedFile.getEncrypted(), decryptedMetadataKey);
-            decryptedFile.setEncrypted(EncryptionUtils.deserializeJSON(dataJson,
-                    new TypeToken<DecryptedFolderMetadata.Data>() {
-                    }));
+
+            decryptedFile.setEncrypted(EncryptionUtils.deserializeJSON(dataJson, folderDataType));
 
             files.put(key, decryptedFile);
         }

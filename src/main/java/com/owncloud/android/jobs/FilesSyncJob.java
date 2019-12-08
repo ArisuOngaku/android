@@ -166,14 +166,7 @@ public class FilesSyncJob extends Job {
         boolean needsCharging;
         boolean needsWifi;
         File file;
-        ArbitraryDataProvider arbitraryDataProvider;
         Account account = userAccountManager.getAccountByName(syncedFolder.getAccount());
-
-        if (lightVersion) {
-            arbitraryDataProvider = new ArbitraryDataProvider(context.getContentResolver());
-        } else {
-            arbitraryDataProvider = null;
-        }
 
         for (String path : filesystemDataProvider.getFilesForUpload(syncedFolder.getLocalPath(),
                 Long.toString(syncedFolder.getId()))) {
@@ -182,6 +175,7 @@ public class FilesSyncJob extends Job {
             String mimeType = MimeTypeUtil.getBestMimeTypeByFilename(file.getAbsolutePath());
 
             if (lightVersion) {
+                ArbitraryDataProvider arbitraryDataProvider = new ArbitraryDataProvider(context.getContentResolver());
                 needsCharging = resources.getBoolean(R.bool.syncedFolder_light_on_charging);
                 needsWifi = account == null || arbitraryDataProvider.getBooleanValue(account.name,
                                                                                      SettingsActivity.SYNCED_FOLDER_LIGHT_UPLOAD_ON_WIFI);

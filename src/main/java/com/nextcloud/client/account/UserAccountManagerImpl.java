@@ -236,8 +236,7 @@ public class UserAccountManagerImpl implements UserAccountManager {
         try {
             Account currentPlatformAccount = getCurrentAccount();
             return new OwnCloudAccount(currentPlatformAccount, context);
-        } catch (com.owncloud.android.lib.common.accounts.AccountUtils.AccountNotFoundException |
-            IllegalArgumentException ex) {
+        } catch (AccountUtils.AccountNotFoundException | IllegalArgumentException ex) {
             return null;
         }
     }
@@ -296,7 +295,7 @@ public class UserAccountManagerImpl implements UserAccountManager {
 
         if (account != null) {
             AccountManager accountMgr = AccountManager.get(MainApp.getAppContext());
-            String serverVersionStr = accountMgr.getUserData(account, com.owncloud.android.lib.common.accounts.AccountUtils.Constants.KEY_OC_VERSION);
+            String serverVersionStr = accountMgr.getUserData(account, AccountUtils.Constants.KEY_OC_VERSION);
 
             if (serverVersionStr != null) {
                 serverVersion = new OwnCloudVersion(serverVersionStr);
@@ -336,7 +335,7 @@ public class UserAccountManagerImpl implements UserAccountManager {
         GetUserInfoRemoteOperation remoteUserNameOperation = new GetUserInfoRemoteOperation();
 
         for (Account account : ocAccounts) {
-            String storedUserId = accountManager.getUserData(account, com.owncloud.android.lib.common.accounts.AccountUtils.Constants.KEY_USER_ID);
+            String storedUserId = accountManager.getUserData(account, AccountUtils.Constants.KEY_USER_ID);
 
             if (!TextUtils.isEmpty(storedUserId)) {
                 continue;
@@ -365,10 +364,10 @@ public class UserAccountManagerImpl implements UserAccountManager {
             }
 
             accountManager.setUserData(account,
-                                       com.owncloud.android.lib.common.accounts.AccountUtils.Constants.KEY_DISPLAY_NAME,
+                                       AccountUtils.Constants.KEY_DISPLAY_NAME,
                                        displayName);
             accountManager.setUserData(account,
-                                       com.owncloud.android.lib.common.accounts.AccountUtils.Constants.KEY_USER_ID,
+                                       AccountUtils.Constants.KEY_USER_ID,
                                        userId);
 
             success = true;

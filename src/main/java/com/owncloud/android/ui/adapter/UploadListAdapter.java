@@ -467,10 +467,8 @@ public class UploadListAdapter extends SectionedRecyclerViewAdapter<SectionedVie
      * @return Text describing the status of the given upload.
      */
     private String getStatusText(OCUpload upload) {
-
         String status;
         switch (upload.getUploadStatus()) {
-
             case UPLOAD_IN_PROGRESS:
                 status = parentActivity.getString(R.string.uploads_view_later_waiting_to_upload);
                 FileUploader.FileUploaderBinder binder = parentActivity.getFileUploaderBinder();
@@ -490,7 +488,9 @@ public class UploadListAdapter extends SectionedRecyclerViewAdapter<SectionedVie
 
             default:
                 status = "Uncontrolled status: " + upload.getUploadStatus().toString();
+                break;
         }
+
         return status;
     }
 

@@ -68,6 +68,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.SequenceInputStream;
 import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
@@ -137,11 +138,11 @@ public class InputStreamBinder extends IInputStreamService.Stub {
             exception = e;
         }
 
-        try {
+        try (
             // Write exception to the stream followed by the actual network stream
             InputStream exceptionStream = serializeObjectToInputStreamV2(exception, response.getPlainHeadersString());
-            InputStream resultStream = new java.io.SequenceInputStream(exceptionStream, response.getBody());
-
+            InputStream resultStream = new SequenceInputStream(exceptionStream, response.getBody())
+        ) {
             return ParcelFileDescriptorUtil.pipeFrom(resultStream, thread -> Log.d(TAG, "Done sending result"));
         } catch (IOException e) {
             Log_OC.e(TAG, "Error while sending response back to client app", e);
@@ -183,7 +184,7 @@ public class InputStreamBinder extends IInputStreamService.Stub {
             InputStream exceptionStream = serializeObjectToInputStream(exception);
             InputStream resultStream;
             if (httpStream != null) {
-                resultStream = new java.io.SequenceInputStream(exceptionStream, httpStream);
+                resultStream = new SequenceInputStream(exceptionStream, httpStream);
             } else {
                 resultStream = exceptionStream;
             }
